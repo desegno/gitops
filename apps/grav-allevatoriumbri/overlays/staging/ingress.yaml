@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: grav-allevatoriumbri-ingress
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: allevatoriumbri.staging.desegno.it
+    http:
+      paths:
+      - pathType: Prefix
+        path: /
+        backend:
+          service:
+            name: grav-allevatoriumbri-svc
+            port:
+              number: 80
+  tls:
+  - hosts:
+    - allevatoriumbri.staging.desegno.it
+    secretName: grav-allevatoriumbri-tls

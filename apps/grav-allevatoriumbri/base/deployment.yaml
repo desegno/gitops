@@ -1,0 +1,79 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grav-allevatoriumbri
+  labels:
+    app: grav-allevatoriumbri
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: grav-allevatoriumbri
+  template:
+    metadata:
+      labels:
+        app: grav-allevatoriumbri
+    spec:
+      volumes:
+        - name: grav-allevatoriumbri-gs-conf
+          configMap:
+            name: grav-allevatoriumbri-gs-conf
+        - name: grav-allevatoriumbri-git
+          emptyDir:
+            sizeLimit: 2Gi
+      initContainers:
+        - image: alpine/git
+          name: git
+          command: ["sh", "-c"]
+          args:
+            - |
+              git clone --single-branch --branch staging https://desegno-it:$(GITHUB_TOKEN)@github.com/desegno/grav-allevatoriumbri.git /git
+          volumeMounts:
+            - name: grav-allevatoriumbri-git
+              mountPath: /git
+          env:
+            - name: GITHUB_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: grav-allevatoriumbri-ght
+                  key: github_token
+          #securityContext:
+          #  - runAsUser: 911
+          #    runAsGroup: 911
+      containers:
+        - name: grav
+          image: grav-gitsync
+          env:
+            - name: PGID
+              value: "911"
+            - name: PUID
+              value: "911"
+            - name: TZ
+              value: Europe/Rome
+          volumeMounts:
+            - name: grav-allevatoriumbri-gs-conf
+              mountPath: /tmp/git-sync
+            - name: grav-allevatoriumbri-git
+              mountPath: /app/www/public/user
+          ports:
+            - containerPort: 80
+              protocol: TCP
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "250m"
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          startupProbe:
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            timeoutSeconds: 1
+            successThreshold: 1
+            failureThreshold: 6
+            exec:
+              command:
+                - cat
+                - /app/gitsync_ok
+
+      restartPolicy: Always
