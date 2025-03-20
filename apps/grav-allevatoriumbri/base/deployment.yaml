@@ -16,8 +16,8 @@ spec:
     spec:
       volumes:
         - name: grav-allevatoriumbri-gs-conf
-          secret:
-            secretName: grav-allevatoriumbri-gs-conf
+          configMap:
+            name: grav-allevatoriumbri-gs-conf
         - name: grav-allevatoriumbri-git
           emptyDir:
             sizeLimit: 2Gi

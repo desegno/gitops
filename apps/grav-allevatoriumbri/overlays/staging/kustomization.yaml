@@ -14,6 +14,11 @@ patches:
   - path: deployment.yaml
   - path: ingress.yaml
 
+configMapGenerator:
+- name: grav-allevatoriumbri-gs-conf
+  files:
+  - git-sync.properties
+
 generators:
   - ./secret-gen-ght.yaml
-  - ./secret-gen-gitsync-conf.yaml
+
