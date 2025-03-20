@@ -9,7 +9,7 @@ spec:
         - name: XDG_CONFIG_HOME
           value: /.config
         - name: SOPS_AGE_KEY_FILE
-          value: /.config/sops/age/keys.txt
+          value: /home/argocd/.config/sops/age/keys.txt
       volumes:
         - name: custom-tools
           emptyDir: {}
@@ -39,7 +39,7 @@ spec:
             - mountPath: /usr/local/bin/ksops
               name: custom-tools
               subPath: ksops
-            - mountPath: /.config/sops/age/keys.txt
+            - mountPath: /home/argocd/.config/sops/age/keys.txt
               name: ksops-age
               subPath: keys.txt
 
